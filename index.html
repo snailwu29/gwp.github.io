@@ -1,0 +1,56 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Feedback Portal</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h2>Welcome, <span id="userDisplay"></span>!</h2>
+    <textarea id="feedbackInput" placeholder="Your feedback..."></textarea>
+    <button onclick="submitFeedback()">Submit</button>
+    <h3>Your Feedback</h3>
+    <div id="feedbackList"></div>
+    <button onclick="logout()" class="logout">Logout</button>
+  </div>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem("currentUser"));
+    if (!user) {
+      window.location.href = "login.html";
+    } else {
+      document.getElementById("userDisplay").textContent = user.username;
+    }
+
+    function submitFeedback() {
+      const input = document.getElementById("feedbackInput");
+      const text = input.value.trim();
+      if (!text) return;
+
+      const feedback = JSON.parse(localStorage.getItem("feedback") || "{}");
+      if (!feedback[user.username]) feedback[user.username] = [];
+      feedback[user.username].push(text);
+      localStorage.setItem("feedback", JSON.stringify(feedback));
+
+      input.value = "";
+      displayFeedback();
+    }
+
+    function displayFeedback() {
+      const feedback = JSON.parse(localStorage.getItem("feedback") || "{}");
+      const userFeedback = feedback[user.username] || [];
+      const list = document.getElementById("feedbackList");
+      list.innerHTML = userFeedback.map(msg => `<div class="feedback-item">${msg}</div>`).join("");
+    }
+
+    function logout() {
+      localStorage.removeItem("currentUser");
+      window.location.href = "login.html";
+    }
+
+    displayFeedback();
+  </script>
+</body>
+</html>
